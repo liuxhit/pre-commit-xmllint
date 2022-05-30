@@ -12,3 +12,11 @@
   entry: check-xmllint
   language: script
   types_or: [xml]
+
+- id: check-xmllint-syntax
+  name: Check XML files syntax
+  description: Check that XML files syntax matches xmllint --noout option
+  entry: check-xmllint
+  args: [-c]
+  language: script
+  types_or: [xml]

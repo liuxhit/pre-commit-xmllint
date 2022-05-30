@@ -9,21 +9,26 @@ if [ -t 1 ]; then
   N=$(tput sgr0)
 fi
 
-args=$(getopt i $*)
+args=$(getopt ic $*)
 if [ $? -ne 0 ]; then
   echo "Usage: check-xmllint [-i] <files..>
   -i overwrite files with xmllint formatted content
+  -c only check xml syntax, do not check format
 "
   exit 2
 fi
 set -- $args
 
 inplace=0
+syntax_only=0
 
 while true; do
   case "$1" in
     -i)
       inplace=1
+      ;;
+    -c)
+      syntax_only=1
       ;;
     --)
       shift
@@ -36,6 +41,14 @@ done
 retval=0
 
 for FILE in $*; do
+  if [ $syntax_only -eq 1 ] ; then
+    if ! $XMLLINT --noout $FILE ; then
+      echo "XML check for $FILE: ${R}cannot parse${N}"
+      retval=3
+      continue
+    fi
+    continue
+  fi
   tmpfile=$(mktemp)
   if ! $XMLLINT --format $FILE > $tmpfile; then
       echo "XML check for $FILE: ${R}cannot parse${N}"
